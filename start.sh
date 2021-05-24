@@ -52,6 +52,7 @@ export ES_OFFCHAIN_PASSWORD=""
 
 # Substrate related variables
 export SUBSTRATE_NODE_EXTRA_OPTS=""
+export SUBSTRATE_RPC_CORS=",https://app.subsocial.network"
 
 # Offchain related variables
 export OFFCHAIN_CORS="http://localhost"
@@ -207,7 +208,11 @@ parse_substrate_extra_opts(){
         if [[ -z $1 ]]; then
             break
         else
+            if [[ $1 == '--rpc-cors' ]]; then
+                SUBSTRATE_RPC_CORS="$2"
+            fi
             SUBSTRATE_NODE_EXTRA_OPTS+=' '$1
+
             shift
         fi
     done
