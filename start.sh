@@ -399,6 +399,8 @@ while :; do
             else
                 export OFFCHAIN_VERSION=$2
                 export SUBSTRATE_NODE_VERSION=$2
+                export HYDRA_PROCESSOR_VERSION=$2
+                export HYDRA_QUERY_NODE_VERSION=$2
                 printf $COLOR_Y'Switched to components by tag '$2'\n\n'$COLOR_RESET
                 shift
             fi
@@ -468,7 +470,6 @@ while :; do
         --only-offchain)
             COMPOSE_FILES=""
             COMPOSE_FILES+=" -f $COMPOSE_DIR/postgres.yml"
-            COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra.yml"
             COMPOSE_FILES+=" -f $COMPOSE_DIR/offchain.yml"
             COMPOSE_FILES+=" -f $COMPOSE_DIR/elasticsearch.yml"
             COMPOSE_FILES+=" -f $COMPOSE_DIR/ipfs.yml"
