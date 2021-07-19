@@ -550,28 +550,25 @@ while :; do
             fi
             ;;
 
-        --ipfs-ip)
+        --ipfs-url)
             # TODO: regex check
             # TODO: add https support
             if [[ -z $2 ]] || [[ -z $3 ]]; then
-                printf $COLOR_R'ERROR: --ipfs-ip must be provided with (node/cluster/all) and IP arguments\nExample: --ipfs-ip cluster 172.15.0.9\n'$COLOR_RESET >&2
+                printf $COLOR_R'ERROR: --ipfs-ip must be provided with (api/readonly/cluster) and IP arguments\nExample: --ipfs-url cluster http://172.15.0.9:9094\n'$COLOR_RESET >&2
                 break
             fi
             case $2 in
-                "node")
-                    IPFS_NODE_URL=http://$3:5001
-                    IPFS_READ_ONLY_NODE_URL=http://$3:8080
+                "api")
+                    IPFS_NODE_URL=$3
+                    ;;
+                "readonly")
+                    IPFS_READ_ONLY_NODE_URL=$3
                     ;;
                 "cluster")
-                    IPFS_CLUSTER_URL=http://$3:9094
-                    ;;
-                "all")
-                    IPFS_NODE_URL=http://$3:5001
-                    IPFS_READ_ONLY_NODE_URL=http://$3:8080
-                    IPFS_CLUSTER_URL=http://$3:9094
+                    IPFS_CLUSTER_URL=$3
                     ;;
                 *)
-                    printf $COLOR_R'ERROR: --ipfs-ip must be provided with (readonly/cluster/all)\n'$COLOR_RESET >&2
+                    printf $COLOR_R'ERROR: --ipfs-ip must be provided with (api/readonly/cluster)\n'$COLOR_RESET >&2
                     break
                     ;;
             esac
