@@ -68,6 +68,7 @@ export OFFCHAIN_VERSION=latest
 export SUBSTRATE_NODE_VERSION=latest
 export HYDRA_QUERY_NODE_VERSION=latest
 export HYDRA_PROCESSOR_VERSION=latest
+export KUSAMA_HYDRA_PROCESSOR_VERSION=latest
 
 # Docker services
 export SERVICE_POSTGRES=postgres
@@ -81,6 +82,7 @@ export SERVICE_NODE_VALIDATOR=node-validator
 export SERVICE_CADDY=caddy
 export SERVICE_HYDRA_QUERY_NODE=hydra-query-node
 export SERVICE_HYDRA_PROCESSOR=hydra-processor
+export SERVICE_KUSAMA_HYDRA_PROCESSOR=kusama-hydra-processor
 
 set_port_if_available(){
     local var_to_write="$1"
@@ -204,6 +206,7 @@ export_container_names(){
     export CONT_CADDY=$PROJECT_NAME-proxy
     export CONT_HYDRA_QUERY_NODE=$PROJECT_NAME-hydra-query-node
     export CONT_HYDRA_PROCESSOR=$PROJECT_NAME-hydra-processor
+    export CONT_KUSAMA_HYDRA_PROCESSOR=$PROJECT_NAME-kusama-hydra-processor
 }
 export_container_names
 
@@ -222,7 +225,8 @@ SELECTED_SUBSTRATE=$SUBSTRATE_RPC_COMPOSE$SUBSTRATE_VALIDATOR_COMPOSE
 
 COMPOSE_FILES=""
 COMPOSE_FILES+=" -f $COMPOSE_DIR/postgres.yml"
-COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra.yml"
+COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra/subsocial.yml"
+COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra/kusama.yml"
 COMPOSE_FILES+=" -f $COMPOSE_DIR/offchain.yml"
 COMPOSE_FILES+=" -f $COMPOSE_DIR/elasticsearch.yml"
 COMPOSE_FILES+=" -f $COMPOSE_DIR/ipfs.yml"
@@ -407,6 +411,7 @@ while :; do
                 export SUBSTRATE_NODE_VERSION=$2
                 export HYDRA_PROCESSOR_VERSION=$2
                 export HYDRA_QUERY_NODE_VERSION=$2
+                export KUSAMA_HYDRA_QUERY_NODE_VERSION=$2
                 printf $COLOR_Y'Switched to components by tag '$2'\n\n'$COLOR_RESET
                 shift
             fi
@@ -460,8 +465,11 @@ while :; do
             ;;
 
         --no-hydra)
-            COMPOSE_FILES="${COMPOSE_FILES/ -f ${COMPOSE_DIR}\/hydra.yml/}"
-            printf $COLOR_Y'Starting without Hydra processor and query-node...\n\n'$COLOR_RESET
+            COMPOSE_FILES="${COMPOSE_FILES/ -f ${COMPOSE_DIR}\/hydra/subsocial.yml/}"
+            [ "$2" == "no-kusama" ] && shift \
+                && COMPOSE_FILES="${COMPOSE_FILES/ -f ${COMPOSE_DIR}\/hydra/kusama.yml/}"
+
+            printf $COLOR_Y'Starting without Hydra processors and query-node...\n\n'$COLOR_RESET
             ;;
 
         --no-postgres)
@@ -509,8 +517,11 @@ while :; do
         --only-hydra)
             COMPOSE_FILES=""
             COMPOSE_FILES+=" -f $COMPOSE_DIR/postgres.yml"
-            COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra.yml"
-            printf $COLOR_Y'Starting Hydra processor and query-node...\n\n'$COLOR_RESET
+            COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra/subsocial.yml"
+            [ "$2" == "with-kusama" ] && shift \
+                && COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra/kusama.yml"
+
+            printf $COLOR_Y'Starting Hydra processors and query-node...\n\n'$COLOR_RESET
             ;;
 
         --only-postgres)

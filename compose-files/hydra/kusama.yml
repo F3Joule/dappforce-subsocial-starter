@@ -1,0 +1,27 @@
+version: "3.4"
+services:
+  kusama-hydra-processor:
+    image: f3joule/kusama-hydra-processor:$KUSAMA_HYDRA_PROCESSOR_VERSION
+    container_name: $CONT_KUSAMA_HYDRA_PROCESSOR
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      - IPFS_READ_ONLY_NODE_URL=$IPFS_READ_ONLY_NODE_URL
+      - DB_HOST=$SERVICE_POSTGRES
+      - DB_PORT=$OFFCHAIN_POSTGRES_PORT
+      - GRAPHQL_SERVER_HOST=localhost
+      - GRAPHQL_SERVER_PORT=$GRAPHQL_SERVER_PORT
+      - WARTHOG_APP_HOST=localhost
+      - WARTHOG_APP_PORT=$WARTHOG_APP_PORT
+      - WARTHOG_DB_DATABASE=$DB_NAME
+      - WARTHOG_DB_USERNAME=$DB_USER
+      - WARTHOG_DB_PASSWORD=$DB_PASS
+      - WARTHOG_DB_HOST=$SERVICE_POSTGRES
+      - WARTHOG_DB_PORT=$OFFCHAIN_POSTGRES_PORT
+      - POLL_INTERVAL_MS=300
+      - DEBUG=hydra-processor:*
+      - ID=kusama
+      - INDEXER_ENDPOINT_URL=https://indexer-kusama.joystream.app/graphql
+    depends_on:
+      - $SERVICE_POSTGRES
