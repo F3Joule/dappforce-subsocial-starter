@@ -218,7 +218,7 @@ SELECTED_SUBSTRATE=$SUBSTRATE_RPC_COMPOSE$SUBSTRATE_VALIDATOR_COMPOSE
 
 COMPOSE_FILES=""
 COMPOSE_FILES+=" -f $COMPOSE_DIR/postgres.yml"
-COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra.yml"
+COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra/subsocial.yml"
 COMPOSE_FILES+=" -f $COMPOSE_DIR/offchain.yml"
 COMPOSE_FILES+=" -f $COMPOSE_DIR/elasticsearch.yml"
 COMPOSE_FILES+=" -f $COMPOSE_DIR/ipfs.yml"
@@ -454,7 +454,7 @@ while :; do
             ;;
 
         --no-hydra)
-            COMPOSE_FILES="${COMPOSE_FILES/ -f ${COMPOSE_DIR}\/hydra.yml/}"
+            COMPOSE_FILES="${COMPOSE_FILES/ -f ${COMPOSE_DIR}\/hydra/subsocial.yml/}"
             printf $COLOR_Y'Starting without Hydra processor and query-node...\n\n'$COLOR_RESET
             ;;
 
@@ -503,7 +503,7 @@ while :; do
         --only-hydra)
             COMPOSE_FILES=""
             COMPOSE_FILES+=" -f $COMPOSE_DIR/postgres.yml"
-            COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra.yml"
+            COMPOSE_FILES+=" -f $COMPOSE_DIR/hydra/subsocial.yml"
             printf $COLOR_Y'Starting Hydra processor and query-node...\n\n'$COLOR_RESET
             ;;
 
