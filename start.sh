@@ -55,7 +55,9 @@ export SUBSTRATE_NODE_EXTRA_OPTS=""
 
 # Offchain related variables
 export OFFCHAIN_CORS="http://localhost"
-export OFFCHAIN_SUBSCRIBER_CMD="yarn subscriber:with-ws"
+export OFFCHAIN_SUBSCRIBER_CMD="\"yarn subscriber:with-ws\""
+# TODO: make it possible to replace offchain-api command
+export OFFCHAIN_API_CMD="\"yarn api\""
 
 # Docker images versions
 export POSTGRES_VERSION=12.4
@@ -742,7 +744,6 @@ while :; do
                 printf $COLOR_R'WARN: --offchain-cmd must be provided with a command string\n'$COLOR_RESET >&2
                 break
             else
-                # parse_offchain_command $2
                 OFFCHAIN_SUBSCRIBER_CMD="'$2'"
                 shift
             fi

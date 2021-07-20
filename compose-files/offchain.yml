@@ -4,7 +4,7 @@ services:
     image: dappforce/subsocial-offchain:$OFFCHAIN_VERSION
     container_name: $CONT_OFFCHAIN_API
     restart: always
-    command: "yarn api"
+    command: $OFFCHAIN_API_CMD
     environment:
       - NODE_ENV=production
       - PGHOST=$SERVICE_POSTGRES
