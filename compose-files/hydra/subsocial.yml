@@ -38,5 +38,6 @@ services:
       - WARTHOG_DB_PORT=$OFFCHAIN_POSTGRES_PORT
       - POLL_INTERVAL_MS=300
       - DEBUG=hydra-processor:*
+      - ID=subsocial
     depends_on:
       - $SERVICE_POSTGRES
