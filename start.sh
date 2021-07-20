@@ -55,7 +55,7 @@ export SUBSTRATE_NODE_EXTRA_OPTS=""
 
 # Offchain related variables
 export OFFCHAIN_CORS="http://localhost"
-export OFFCHAIN_CUSTOM_CMD=""
+export OFFCHAIN_SUBSCRIBER_CMD="yarn subscriber:with-ws"
 
 # Docker images versions
 export POSTGRES_VERSION=12.4
@@ -72,7 +72,8 @@ export SERVICE_POSTGRES=postgres
 export SERVICE_ELASTICSEARCH=elasticsearch
 export SERVICE_IPFS_CLUSTER=ipfs-cluster
 export SERVICE_IPFS_NODE=ipfs-node
-export SERVICE_OFFCHAIN=offchain
+export SERVICE_OFFCHAIN_API=offchain-api
+export SERVICE_OFFCHAIN_SUBSCRIBER=offchain-subscriber
 export SERVICE_NODE_RPC=node-rpc
 export SERVICE_NODE_VALIDATOR=node-validator
 export SERVICE_CADDY=caddy
@@ -99,8 +100,8 @@ set_port_if_available(){
 # URL variables
 export_container_urls(){
     export SUBSTRATE_RPC_URL=ws://$SERVICE_NODE_RPC:$SUBSTRATE_WS_PORT
-    export OFFCHAIN_URL=http://$SERVICE_OFFCHAIN:$OFFCHAIN_API_PORT
-    export OFFCHAIN_WS=ws://$SERVICE_OFFCHAIN:$OFFCHAIN_WS_PORT
+    export OFFCHAIN_URL=http://$SERVICE_OFFCHAIN_API:$OFFCHAIN_API_PORT
+    export OFFCHAIN_WS=ws://$SERVICE_OFFCHAIN_API:$OFFCHAIN_WS_PORT
     export ES_URL=http://$SERVICE_ELASTICSEARCH:$ES_PORT
     export IPFS_CLUSTER_URL=http://$SERVICE_IPFS_CLUSTER:$IPFS_CLUSTER_API_PORT
     export IPFS_NODE_URL=http://$SERVICE_IPFS_NODE:$IPFS_NODE_PORT
@@ -170,7 +171,7 @@ show_ports_info(){
         echo "IPFS Cluster TCP:" "$IPFS_CLUSTER_TCP_PORT"
     fi
 
-    is_running="$(docker ps | grep -wi "$CONT_OFFCHAIN")" || printf ""
+    is_running="$(docker ps | grep -wi "$CONT_OFFCHAIN_API")" || printf ""
     if [[ -n "$is_running" ]]; then
         echo "Offchain API:" "$OFFCHAIN_API_PORT"
         echo "Offchain Notifications WebSocket:" "$OFFCHAIN_WS_PORT"
@@ -194,7 +195,8 @@ export_container_names(){
     export CONT_ELASTICSEARCH=$PROJECT_NAME-elasticsearch
     export CONT_IPFS_CLUSTER=$PROJECT_NAME-ipfs-cluster
     export CONT_IPFS_NODE=$PROJECT_NAME-ipfs-node
-    export CONT_OFFCHAIN=$PROJECT_NAME-offchain
+    export CONT_OFFCHAIN_API=$PROJECT_NAME-offchain-api
+    export CONT_OFFCHAIN_SUBSCRIBER=$PROJECT_NAME-offchain-subscriber
     export CONT_NODE_RPC=$PROJECT_NAME-node-rpc
     export CONT_NODE_VALIDATOR=$PROJECT_NAME-node-validator
     export CONT_CADDY=$PROJECT_NAME-proxy
@@ -269,7 +271,8 @@ stop_container() {
         && exit 1
 
     [[ $1 == offchain ]] && [[ $COMPOSE_FILES =~ 'offchain' ]] \
-        && docker container stop $CONT_OFFCHAIN > /dev/null
+        && docker container stop $CONT_OFFCHAIN_API > /dev/null \
+        && docker container stop $CONT_OFFCHAIN_SUBSCRIBER > /dev/null
 
     if [[ $COMPOSE_FILES =~ 'ipfs' ]]; then
         [[ $1 == ipfs-cluster ]] && cont_name=$CONT_IPFS_CLUSTER
@@ -290,7 +293,7 @@ start_container(){
         && printf $COLOR_R"FATAL: 'start_container' command must be provided with one argument" && exit 1
 
     [[ $1 == offchain ]] && [[ $COMPOSE_FILES =~ 'offchain' ]] \
-        && cont_name=$CONT_OFFCHAIN
+        && cont_name="$CONT_OFFCHAIN_API $CONT_OFFCHAIN_SUBSCRIBER"
 
     if [[ $COMPOSE_FILES =~ 'ipfs' ]]; then
         [[ $1 == ipfs-cluster ]] && cont_name=$CONT_IPFS_CLUSTER
@@ -310,21 +313,22 @@ start_container(){
 
 recreate_container(){
     local recreate_allowed=""
+    local services=""
 
     [[ -z $1 ]] || [[ -n $2 ]] \
         && printf $COLOR_R"FATAL: 'recreate_container' command must be provided with one argument" && exit 1
 
     [[ $1 == offchain && $COMPOSE_FILES =~ 'offchain' ]] \
-        && recreate_allowed="true"
+        && recreate_allowed="true" && services+="$SERVICE_OFFCHAIN_API $SERVICE_OFFCHAIN_SUBSCRIBER"
 
     [[ $1 == ipfs-cluster || $1 == ipfs-node ]] && [[ $COMPOSE_FILES =~ 'ipfs' ]] \
-        && recreate_allowed="true"
+        && recreate_allowed="true" && services+=" $SERVICE_IPFS_NODE $SERVICE_IPFS_CLUSTER"
 
     if [[ -z $recreate_allowed ]]; then
         printf $COLOR_R"ERROR: %s cannot be restarted before corresponding service included" "$1"
         exit 1
     else
-        exec_docker_compose up -d "$1"
+        exec_docker_compose up -d "$services"
     fi
 }
 
@@ -739,7 +743,7 @@ while :; do
                 break
             else
                 # parse_offchain_command $2
-                OFFCHAIN_CUSTOM_CMD="'$2'"
+                OFFCHAIN_SUBSCRIBER_CMD="'$2'"
                 shift
             fi
             ;;
