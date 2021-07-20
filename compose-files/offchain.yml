@@ -7,6 +7,7 @@ services:
     command: $OFFCHAIN_API_CMD
     environment:
       - NODE_ENV=production
+      - SUBSTRATE_URL=$SUBSTRATE_RPC_URL
       - PGHOST=$SERVICE_POSTGRES
       - PGDATABASE=$DB_NAME
       - PGUSER=$DB_USER
