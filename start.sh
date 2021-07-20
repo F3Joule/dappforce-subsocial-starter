@@ -8,10 +8,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export DIR
 COMPOSE_DIR="$DIR/compose-files"
 
-# Default props
-export EXPOSE_IP=127.0.0.1
-export EXTERNAL_VOLUME=~/subsocial_data
-
 # colors
 COLOR_R="\033[0;31m"    # red
 COLOR_Y="\033[0;33m"    # yellow
@@ -21,6 +17,7 @@ COLOR_RESET="\033[00m"  # reset color
 if [[ "$1" == "--instance" ]]; then
     if [[ -n $2 ]] && [[ $2 =~ [a-zA-Z]{0,16} ]]; then
         PROJECT_NAME=$2
+        EXTERNAL_VOLUME=~/subsocial_data_$PROJECT_NAME
         shift 2
     else
         printf $COLOR_R"FATAL: '--instance' option must be provided with instance name\n"
@@ -28,7 +25,12 @@ if [[ "$1" == "--instance" ]]; then
     fi
 else
     PROJECT_NAME="subsocial"
+    EXTERNAL_VOLUME=~/subsocial_data
 fi
+
+# Default props
+export EXPOSE_IP=127.0.0.1
+export EXTERNAL_VOLUME
 
 FORCEPULL="false"
 STOP_MODE="none"
