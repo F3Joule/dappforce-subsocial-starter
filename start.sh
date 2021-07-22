@@ -316,13 +316,11 @@ set_ipfs_cluster_ports(){
     printf "Setting up IPFS Cluster ports...\n"
 
     local temp_file_name=tmp.$$.json
-    local new_api_port_query=".cluster.listen_multiaddress = [
+    local new_tcp_port_query=".cluster.listen_multiaddress = [
       \"/ip4/0.0.0.0/tcp/$IPFS_CLUSTER_TCP_PORT\",
       \"/ip4/0.0.0.0/udp/$IPFS_CLUSTER_TCP_PORT/quic\"
     ]"
-    local new_tcp_port_query=".api.restapi.http_listen_multiaddress = \"/ip4/0.0.0.0/tcp/$IPFS_CLUSTER_API_PORT\""
 
-    jq_query "$new_api_port_query" $CLUSTER_CONFIG_PATH
     jq_query "$new_tcp_port_query" $CLUSTER_CONFIG_PATH
 }
 
