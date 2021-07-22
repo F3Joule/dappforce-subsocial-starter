@@ -247,6 +247,19 @@ parse_substrate_extra_opts(){
     done
 }
 
+jq_query(){
+    if [[ -z $2 ]] || [[ -z $1 ]]; then
+        printf $COLOR_R"FATAL: 'jq_query' command must be provided with two arguments: jq_query <query> <filename>"
+    fi
+
+    local query=$1
+    local file=$2
+    local temp_file_name=tmp.$$.json
+
+    jq "$query" "$file" > $temp_file_name
+    mv $temp_file_name "$file"
+}
+
 write_boostrap_peers(){
     test_jq_installation
 
@@ -256,10 +269,8 @@ write_boostrap_peers(){
             break
         else
             printf "%s\n" "$1"
-            local temp_file_name=tmp.$$.json
             local new_trusted_peers_query=".cluster.peer_addresses += [$1]"
-            jq "$new_trusted_peers_query" $CLUSTER_CONFIG_PATH > $temp_file_name
-            mv $temp_file_name $CLUSTER_CONFIG_PATH
+            jq_query "$new_trusted_peers_query" $CLUSTER_CONFIG_PATH
             shift
         fi
     done
@@ -269,6 +280,50 @@ wait_for_ipfs_node(){
     until curl -s "localhost:$IPFS_NODE_PORT/version" > /dev/null; do
         sleep 1
     done
+}
+
+try_set_ipfs_node_cors(){
+    if [[ $(docker exec $CONT_IPFS_NODE ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin \
+            '["'$IPFS_CLUSTER_URL'", "'$OFFCHAIN_URL'"]' 2> /dev/null && echo $?) \
+        ]];
+    then return 1; fi
+}
+
+set_ipfs_node_cors(){
+    printf "Setting up IPFS Node Cors...\n"
+    until ! try_set_ipfs_node_cors; do
+        sleep 1
+    done
+}
+
+set_ipfs_node_ports(){
+    printf "Setting up IPFS Node ports...\n"
+
+    # Configure IPFS Node port
+    docker exec $CONT_IPFS_NODE ipfs config --json Addresses.API '"\/ip4\/0.0.0.0\/tcp\/'$IPFS_NODE_PORT'"' 2> /dev/null
+
+    # Configure IPFS Gateway port
+    docker exec $CONT_IPFS_NODE ipfs config --json Addresses.Gateway '"\/ip4\/0.0.0.0\/tcp\/'$IPFS_READONLY_PORT'"' 2> /dev/null
+
+    # Configure IPFS Swarm port
+    docker exec $CONT_IPFS_NODE ipfs config --json \
+        Addresses.Swarm '["/ip4/0.0.0.0/tcp/'$IPFS_SWARM_PORT'", "/ip6/::/tcp/'$IPFS_SWARM_PORT'"]' 2> /dev/null
+}
+
+set_ipfs_cluster_ports(){
+    test_jq_installation
+
+    printf "Setting up IPFS Cluster ports...\n"
+
+    local temp_file_name=tmp.$$.json
+    local new_api_port_query=".cluster.listen_multiaddress = [
+      \"/ip4/0.0.0.0/tcp/$IPFS_CLUSTER_TCP_PORT\",
+      \"/ip4/0.0.0.0/udp/$IPFS_CLUSTER_TCP_PORT/quic\"
+    ]"
+    local new_tcp_port_query=".api.restapi.http_listen_multiaddress = \"/ip4/0.0.0.0/tcp/$IPFS_CLUSTER_API_PORT\""
+
+    jq_query "$new_api_port_query" $CLUSTER_CONFIG_PATH
+    jq_query "$new_tcp_port_query" $CLUSTER_CONFIG_PATH
 }
 
 stop_container() {
@@ -846,17 +901,23 @@ while :; do
                 stop_container offchain
                 stop_container ipfs-cluster
 
-                printf "Wait until IPFS node starts\n"
-                wait_for_ipfs_node
+                # Configure 'Access-Control-Allow-Origin' header for IPFS API
+                set_ipfs_node_cors
 
-                docker exec $CONT_IPFS_NODE ipfs config --json \
-                    API.HTTPHeaders.Access-Control-Allow-Origin '["'$IPFS_CLUSTER_URL'", "'$OFFCHAIN_URL'"]' 2> /dev/null
+                # Configure IPFS Node ports
+                set_ipfs_node_ports
 
                 docker restart $CONT_IPFS_NODE > /dev/null
+
+                printf "Wait until IPFS node starts\n"
                 wait_for_ipfs_node
 
                 printf "Setting up IPFS cluster...\n"
                 [[ -n $CLUSTER_BOOTSTRAP ]] && write_boostrap_peers $CLUSTER_BOOTSTRAP
+
+                #Configure IPFS Cluster ports
+                set_ipfs_cluster_ports
+
                 start_container ipfs-cluster
             fi
 
