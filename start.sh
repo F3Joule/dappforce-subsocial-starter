@@ -118,9 +118,6 @@ set_port_if_available(){
         final_port="$((port_to_check + offset))"
     done
 
-    docker ps | grep ":$final_port->" | grep " $service_container" || true
-    printf "Cont: %s\nVar: %s\nStart: %d\nEnd: %d\n\n" "$service_container" "$var_to_write" "$port_to_check" "$final_port"
-
     export "$var_to_write"="$final_port"
 }
 
