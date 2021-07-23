@@ -19,7 +19,7 @@ services:
     container_name: $CONT_HYDRA_PROCESSOR
     restart: unless-stopped
     env_file:
-      - ../../.env
+      - $ENV_FILE_DIR
     environment:
       - SUBSTRATE_URL=$SUBSTRATE_RPC_URL
       - IPFS_READ_ONLY_NODE_URL=$IPFS_READ_ONLY_NODE_URL

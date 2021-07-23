@@ -7,6 +7,7 @@ pushd . > /dev/null
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export DIR
 COMPOSE_DIR="$DIR/compose-files"
+export ENV_FILE_DIR=$COMPOSE_DIR/../.env
 
 # Default props
 export EXPOSE_IP=127.0.0.1

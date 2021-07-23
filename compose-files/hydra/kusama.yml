@@ -5,7 +5,7 @@ services:
     container_name: $CONT_KUSAMA_HYDRA_PROCESSOR
     restart: unless-stopped
     env_file:
-      - ../../.env
+      - $ENV_FILE_DIR
     environment:
       - IPFS_READ_ONLY_NODE_URL=$IPFS_READ_ONLY_NODE_URL
       - DB_HOST=$SERVICE_POSTGRES
