@@ -566,7 +566,7 @@ while :; do
         --only-ipfs)
             COMPOSE_FILES=""
             COMPOSE_FILES+=" -f $COMPOSE_DIR/ipfs.yml"
-            printf $COLOR_Y'Starting only IPFS cluster...\n\n'$COLOR_RESET
+            printf $COLOR_Y'Starting only IPFS Cluster...\n\n'$COLOR_RESET
             ;;
 
         --only-hydra)
@@ -693,7 +693,7 @@ while :; do
             ;;
 
         #################################################
-        # Extra options for IPFS cluster
+        # Extra options for IPFS Cluster
         #################################################
 
         --cluster-id)
@@ -907,10 +907,10 @@ while :; do
 
                 docker restart $CONT_IPFS_NODE > /dev/null
 
-                printf "Wait until IPFS node starts\n"
+                printf "Wait until IPFS Node starts\n"
                 wait_for_ipfs_node
 
-                printf "Setting up IPFS cluster...\n"
+                printf "Setting up IPFS Cluster...\n"
                 [[ -n $CLUSTER_BOOTSTRAP ]] && write_boostrap_peers $CLUSTER_BOOTSTRAP
 
                 #Configure IPFS Cluster ports
