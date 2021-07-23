@@ -130,7 +130,8 @@ export_container_ports(){
     set_port_if_available "IPFS_SWARM_PORT" 4001
 
     set_port_if_available "IPFS_CLUSTER_API_PORT" 9094
-    set_port_if_available "IPFS_CLUSTER_TCP_PORT" 9096
+    set_port_if_available "IPFS_CLUSTER_IPFSPROXY_PORT" $(( IPFS_CLUSTER_API_PORT + 2 ))
+    set_port_if_available "IPFS_CLUSTER_TCP_PORT" $(( IPFS_CLUSTER_IPFSPROXY_PORT + 1 ))
 
     set_port_if_available "OFFCHAIN_API_PORT" 3001
     set_port_if_available "OFFCHAIN_WS_PORT" 3011
