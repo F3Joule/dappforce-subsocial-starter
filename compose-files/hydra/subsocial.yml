@@ -13,8 +13,6 @@ services:
       - GRAPHQL_SERVER_PORT=$GRAPHQL_SERVER_PORT
     ports:
       - $EXPOSE_IP:$GRAPHQL_SERVER_PORT:$GRAPHQL_SERVER_PORT
-    depends_on:
-      - $SERVICE_POSTGRES
 
   hydra-processor:
     image: f3joule/subsocial-hydra-processor:$HYDRA_PROCESSOR_VERSION
@@ -39,5 +37,3 @@ services:
       - POLL_INTERVAL_MS=300
       - DEBUG=hydra-processor:*
       - ID=subsocial
-    depends_on:
-      - $SERVICE_POSTGRES
