@@ -5,7 +5,7 @@ services:
     container_name: $CONT_HYDRA_QUERY_NODE
     restart: unless-stopped
     env_file:
-      - ../.env
+      - $ENV_FILE_DIR
     environment:
       - DB_HOST=$SERVICE_POSTGRES
       - DB_PORT=$OFFCHAIN_POSTGRES_PORT
