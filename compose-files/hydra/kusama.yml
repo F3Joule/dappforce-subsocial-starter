@@ -23,5 +23,3 @@ services:
       - DEBUG=hydra-processor:*
       - ID=kusama
       - INDEXER_ENDPOINT_URL=https://indexer-kusama.joystream.app/graphql
-    depends_on:
-      - $SERVICE_POSTGRES
