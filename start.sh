@@ -86,19 +86,40 @@ export SERVICE_HYDRA_QUERY_NODE=hydra-query-node
 export SERVICE_HYDRA_PROCESSOR=hydra-processor
 export SERVICE_KUSAMA_HYDRA_PROCESSOR=kusama-hydra-processor
 
+# Docker container names
+export_container_names(){
+    export CONT_POSTGRES=$PROJECT_NAME-postgres
+    export CONT_ELASTICSEARCH=$PROJECT_NAME-elasticsearch
+    export CONT_IPFS_CLUSTER=$PROJECT_NAME-ipfs-cluster
+    export CONT_IPFS_NODE=$PROJECT_NAME-ipfs-node
+    export CONT_OFFCHAIN_API=$PROJECT_NAME-offchain-api
+    export CONT_OFFCHAIN_SUBSCRIBER=$PROJECT_NAME-offchain-subscriber
+    export CONT_NODE_RPC=$PROJECT_NAME-node-rpc
+    export CONT_NODE_VALIDATOR=$PROJECT_NAME-node-validator
+    export CONT_CADDY=$PROJECT_NAME-proxy
+    export CONT_HYDRA_QUERY_NODE=$PROJECT_NAME-hydra-query-node
+    export CONT_HYDRA_PROCESSOR=$PROJECT_NAME-hydra-processor
+    export CONT_KUSAMA_HYDRA_PROCESSOR=$PROJECT_NAME-kusama-hydra-processor
+}
+export_container_names
+
 set_port_if_available(){
-    local var_to_write="$1"
-    local port_to_check="$2"
+    local service_container="$1"
+    local var_to_write="$2"
+    local port_to_check="$3"
     local offset=0
 
     local final_port
     final_port="$((port_to_check + offset))"
 
     until ! sudo lsof -i:"$final_port" > /dev/null; do
-        docker ps | grep ":$final_port->" | grep -q " $PROJECT_NAME" && break
+        docker ps | grep ":$final_port->" | grep -q " $service_container" && break
         offset="$((offset + 1))"
         final_port="$((port_to_check + offset))"
     done
+
+    docker ps | grep ":$final_port->" | grep " $service_container" || true
+    printf "Cont: %s\nVar: %s\nStart: %d\nEnd: %d\n\n" "$service_container" "$var_to_write" "$port_to_check" "$final_port"
 
     export "$var_to_write"="$final_port"
 }
@@ -118,28 +139,28 @@ export_container_urls(){
 # Docker container ports
 printf $COLOR_Y'Trying to check whether ports are available, root permissions may be required...\n'$COLOR_RESET
 export_container_ports(){
-    set_port_if_available "SUBSTRATE_WS_PORT" 9944
-    set_port_if_available "SUBSTRATE_RPC_PORT" 9933
-    set_port_if_available "SUBSTRATE_TCP_PORT" 30333
-    set_port_if_available "SUBSTRATE_VALIDATOR_RPC_PORT" 9934
-    set_port_if_available "SUBSTRATE_VALIDATOR_TCP_PORT" 30334
+    set_port_if_available "$CONT_NODE_RPC" "SUBSTRATE_WS_PORT" 9944
+    set_port_if_available "$CONT_NODE_RPC" "SUBSTRATE_RPC_PORT" 9933
+    set_port_if_available "$CONT_NODE_RPC" "SUBSTRATE_TCP_PORT" 30333
+    set_port_if_available "$CONT_NODE_VALIDATOR" "SUBSTRATE_VALIDATOR_RPC_PORT" 9934
+    set_port_if_available "$CONT_NODE_VALIDATOR" "SUBSTRATE_VALIDATOR_TCP_PORT" 30334
 
-    set_port_if_available "ES_PORT" 9200
+    set_port_if_available "$CONT_ELASTICSEARCH" "ES_PORT" 9200
 
-    set_port_if_available "IPFS_READONLY_PORT" 8080
-    set_port_if_available "IPFS_NODE_PORT" 5001
-    set_port_if_available "IPFS_SWARM_PORT" 4001
+    set_port_if_available "$CONT_IPFS_NODE" "IPFS_READONLY_PORT" 8080
+    set_port_if_available "$CONT_IPFS_NODE" "IPFS_NODE_PORT" 5001
+    set_port_if_available "$CONT_IPFS_NODE" "IPFS_SWARM_PORT" 4001
 
-    set_port_if_available "IPFS_CLUSTER_API_PORT" 9094
-    set_port_if_available "IPFS_CLUSTER_IPFSPROXY_PORT" $(( IPFS_CLUSTER_API_PORT + 2 ))
-    set_port_if_available "IPFS_CLUSTER_TCP_PORT" $(( IPFS_CLUSTER_IPFSPROXY_PORT + 1 ))
+    set_port_if_available "$CONT_IPFS_CLUSTER" "IPFS_CLUSTER_API_PORT" 9094
+    set_port_if_available "$CONT_IPFS_CLUSTER" "IPFS_CLUSTER_IPFSPROXY_PORT" $(( IPFS_CLUSTER_API_PORT + 2 ))
+    set_port_if_available "$CONT_IPFS_CLUSTER" "IPFS_CLUSTER_TCP_PORT" $(( IPFS_CLUSTER_IPFSPROXY_PORT + 1 ))
 
-    set_port_if_available "OFFCHAIN_API_PORT" 3001
-    set_port_if_available "OFFCHAIN_WS_PORT" 3011
+    set_port_if_available "$CONT_OFFCHAIN_API" "OFFCHAIN_API_PORT" 3001
+    set_port_if_available "$CONT_OFFCHAIN_SUBSCRIBER" "OFFCHAIN_WS_PORT" 3011
 
-    set_port_if_available "OFFCHAIN_POSTGRES_PORT" 5432
+    set_port_if_available "$CONT_POSTGRES" "OFFCHAIN_POSTGRES_PORT" 5432
 
-    set_port_if_available "GRAPHQL_SERVER_PORT" 4000
+    set_port_if_available "$CONT_HYDRA_QUERY_NODE" "GRAPHQL_SERVER_PORT" 4000
     export WARTHOG_APP_PORT=$GRAPHQL_SERVER_PORT
 
     export_container_urls
@@ -196,23 +217,6 @@ show_ports_info(){
         echo "Warthog app:" "$WARTHOG_APP_PORT"
     fi
 }
-
-# Docker container names
-export_container_names(){
-    export CONT_POSTGRES=$PROJECT_NAME-postgres
-    export CONT_ELASTICSEARCH=$PROJECT_NAME-elasticsearch
-    export CONT_IPFS_CLUSTER=$PROJECT_NAME-ipfs-cluster
-    export CONT_IPFS_NODE=$PROJECT_NAME-ipfs-node
-    export CONT_OFFCHAIN_API=$PROJECT_NAME-offchain-api
-    export CONT_OFFCHAIN_SUBSCRIBER=$PROJECT_NAME-offchain-subscriber
-    export CONT_NODE_RPC=$PROJECT_NAME-node-rpc
-    export CONT_NODE_VALIDATOR=$PROJECT_NAME-node-validator
-    export CONT_CADDY=$PROJECT_NAME-proxy
-    export CONT_HYDRA_QUERY_NODE=$PROJECT_NAME-hydra-query-node
-    export CONT_HYDRA_PROCESSOR=$PROJECT_NAME-hydra-processor
-    export CONT_KUSAMA_HYDRA_PROCESSOR=$PROJECT_NAME-kusama-hydra-processor
-}
-export_container_names
 
 # Docker external volumes
 export IPFS_NODE_STAGING=$EXTERNAL_VOLUME/ipfs/daemon/staging
