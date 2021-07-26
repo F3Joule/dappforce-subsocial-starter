@@ -286,6 +286,12 @@ wait_for_ipfs_node(){
     done
 }
 
+wait_for_ipfs_cluster(){
+    until curl -s "localhost:$IPFS_CLUSTER_API_PORT/version" > /dev/null; do
+        sleep 1
+    done
+}
+
 try_set_ipfs_node_cors(){
     if [[ $(docker exec $CONT_IPFS_NODE ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin \
             '["'$IPFS_CLUSTER_URL'", "'$OFFCHAIN_URL'"]' 2> /dev/null && echo $?) \
@@ -312,20 +318,6 @@ set_ipfs_node_ports(){
     # Configure IPFS Swarm port
     docker exec $CONT_IPFS_NODE ipfs config --json \
         Addresses.Swarm '["/ip4/0.0.0.0/tcp/'$IPFS_SWARM_PORT'", "/ip6/::/tcp/'$IPFS_SWARM_PORT'"]' 2> /dev/null
-}
-
-set_ipfs_cluster_ports(){
-    test_jq_installation
-
-    printf "Setting up IPFS Cluster ports...\n"
-
-    local temp_file_name=tmp.$$.json
-    local new_tcp_port_query=".cluster.listen_multiaddress = [
-      \"/ip4/0.0.0.0/tcp/$IPFS_CLUSTER_TCP_PORT\",
-      \"/ip4/0.0.0.0/udp/$IPFS_CLUSTER_TCP_PORT/quic\"
-    ]"
-
-    jq_query "$new_tcp_port_query" $CLUSTER_CONFIG_PATH
 }
 
 stop_container() {
@@ -901,7 +893,10 @@ while :; do
 
             if [[ $COMPOSE_FILES =~ 'ipfs' ]]; then
                 stop_container offchain
-                stop_container ipfs-cluster
+
+                # Wait until IPFS Cluster starts properly and then stop it
+                printf "\nWait before IPFS Cluster bootstrap.\n"
+                wait_for_ipfs_cluster
 
                 # Configure 'Access-Control-Allow-Origin' header for IPFS API
                 set_ipfs_node_cors
@@ -909,18 +904,14 @@ while :; do
                 # Configure IPFS Node ports
                 set_ipfs_node_ports
 
-                docker restart $CONT_IPFS_NODE > /dev/null
-
-                printf "Wait until IPFS Node starts\n"
-                wait_for_ipfs_node
-
                 printf "Setting up IPFS Cluster...\n"
                 [[ -n $CLUSTER_BOOTSTRAP ]] && write_boostrap_peers $CLUSTER_BOOTSTRAP
 
-                #Configure IPFS Cluster ports
-                set_ipfs_cluster_ports
+                printf "Wait until IPFS Node starts.\n"
+                docker restart $CONT_IPFS_NODE > /dev/null
+                wait_for_ipfs_node
 
-                start_container ipfs-cluster
+                docker restart $CONT_IPFS_CLUSTER > /dev/null
             fi
 
             if [[ $COMPOSE_FILES =~ 'offchain' ]]; then
