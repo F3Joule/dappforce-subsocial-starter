@@ -58,7 +58,7 @@ export SUBSTRATE_NODE_EXTRA_OPTS=""
 
 # Offchain related variables
 export OFFCHAIN_CORS="http://localhost"
-export OFFCHAIN_SUBSCRIBER_CMD="\"yarn init-offchain && yarn subscriber:with-ws\""
+export OFFCHAIN_SUBSCRIBER_CMD="\"yarn init-postgres && yarn subscriber:with-ws\""
 # TODO: make it possible to replace offchain-api command
 export OFFCHAIN_API_CMD="\"yarn api\""
 
