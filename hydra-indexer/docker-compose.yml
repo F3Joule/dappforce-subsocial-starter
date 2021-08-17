@@ -15,7 +15,7 @@ services:
 
   indexer:
     image: joystream/hydra-indexer:3.0.0
-    restart: unless-stopped
+    restart: always
     environment:
       - INDEXER_WORKERS=5
       - DB_NAME=indexer-db
@@ -37,7 +37,7 @@ services:
 
   indexer-api-gateway:
     image: joystream/hydra-indexer-gateway:3.0.0
-    restart: unless-stopped
+    restart: always
     environment:
       - WARTHOG_STARTER_DB_DATABASE=indexer-db
       - WARTHOG_STARTER_DB_HOST=$DB_HOST
