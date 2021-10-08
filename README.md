@@ -228,6 +228,7 @@ The [start.sh](start.sh) script comes with a set of options for customizing proj
 | `--ipfs-ip <readonly/cluster/all>` | Specify custom IPFS IP for IPFS Gateway (readonly), IPFS Cluster or both. |
 | `--substrate-extra-opts`           | Start Substrate node with additional Substrate CLI options. Example: `./start.sh --substrate-extra-opts "--dev --name my-subsocial-node"` |
 | `--substrate-mode <rpc/validator>` | Start Substrate in a specified mode (`rpc` or `validator`). By default (when isn't specified) starts both nodes RPC and Authority (validator). |
+| `--substrate-cors "URL list"`      | Override default RPC-cors for Substrate node (e.g. `--substrate-cors "http://localhost,https://polkadot.js.org"`). By default CORS includes `https://app.subsocial.network`, `https://polkadot.js.org`, `https://polkaverse.com`, and `https://sub.id`. |
 | `--cluster-id`                     | Show IPFS Cluster peers if it's running. |
 | `--cluster-peers <add/remove/override>`| Add, remove or override trusted peers to/from IPFS Cluster. Example: `./start.sh --cluster-peers add '["*"]'` |
 | `--cluster-bootstrap "list"`       | Specify initial IPFS Cluster peers as if it's done via `ipfs-cluster-service` CLI. Example: `./start.sh --cluster-bootstrap "/ip4/<FIRST_IP>/tcp/9066/<FIRST_IDENTITY_ID>, /ip4/<SECOND_IP>/tcp/9066/<SECOND_IDENTITY_ID>"` |

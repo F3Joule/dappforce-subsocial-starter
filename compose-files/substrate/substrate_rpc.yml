@@ -9,7 +9,7 @@ services:
     command: subsocial-node
       --wasm-execution Compiled
       --db-cache 1024
-      --rpc-cors "*"
+      --rpc-cors $SUBSTRATE_RPC_CORS
       --ws-port $SUBSTRATE_WS_PORT
       --port $SUBSTRATE_TCP_PORT
       --rpc-port $SUBSTRATE_RPC_PORT
