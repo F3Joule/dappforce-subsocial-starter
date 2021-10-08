@@ -52,7 +52,7 @@ export ES_OFFCHAIN_PASSWORD=""
 
 # Substrate related variables
 export SUBSTRATE_NODE_EXTRA_OPTS=""
-export SUBSTRATE_RPC_CORS="https://app.subsocial.network,https://polkadot.js.org"
+export SUBSTRATE_RPC_CORS="https://app.subsocial.network,https://sub.id,https://polkadot.js.org"
 
 # Offchain related variables
 export OFFCHAIN_CORS="http://localhost"
