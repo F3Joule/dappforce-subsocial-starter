@@ -2,10 +2,12 @@
 
 set -e
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-USERS_PATH="$SCRIPT_DIR/../res/users"
+RES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/../res"
+USERS_PATH="$RES_DIR/users"
 
 pushd . > /dev/null
+
+[[ ! -d $RES_DIR ]] && mkdir "$RES_DIR"
 
 while ! type htpasswd > /dev/null; do
     echo 'WARN: apache2-utils is not installed on your system. Unable to use htpasswd' >&2
