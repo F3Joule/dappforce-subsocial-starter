@@ -7,7 +7,9 @@ services:
     container_name: traefik
     network_mode: host
     volumes:
-      - ./acme.json:/letsencrypt/acme.json
+      - type: bind
+        source: ./res/acme.json
+        target: /letsencrypt/acme.json
       - ./config.yml:/traefik.yml:ro
       - ./conf.d/:/conf.d/:ro
-      - ./users:/users:ro
+      - ./res/users:/users:ro

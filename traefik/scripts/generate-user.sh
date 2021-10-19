@@ -3,7 +3,7 @@
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-USERS_PATH="$SCRIPT_DIR/users"
+USERS_PATH="$SCRIPT_DIR/../res/users"
 
 pushd . > /dev/null
 
