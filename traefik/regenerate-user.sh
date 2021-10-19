@@ -14,7 +14,7 @@ while ! type htpasswd > /dev/null; do
     break
 done
 
-USERNAME=$(shuf -n1 /usr/share/dict/american-english)
+USERNAME=$(shuf -n1 /usr/share/dict/american-english || echo -n "admin")
 PASSWORD=$(openssl rand -base64 24)
 
 htpasswd -nb "$USERNAME" "$PASSWORD" > "$USERS_PATH"
