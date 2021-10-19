@@ -1,0 +1,12 @@
+version: '3.4'
+services:
+
+  traefik:
+    image: traefik:v2.5
+    container_name: traefik
+    network_mode: host
+    volumes:
+      - ./acme.json:/letsencrypt/acme.json
+      - ./config.yml:/traefik.yml:ro
+      - ./conf.d/:/conf.d/:ro
+      - ./users:/users:ro

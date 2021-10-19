@@ -1,0 +1,53 @@
+http:
+  services:
+    ws-service:
+      loadbalancer:
+        servers:
+          - url: "http://localhost:9944"
+
+    rpc-service:
+      loadbalancer:
+        servers:
+          - url: "http://localhost:9933"
+
+  routers:
+    ws-router:
+      entrypoints:
+        - web
+      rule: "Host(`localhost`) && Path(`/public-ws`)"
+      service: ws-service
+      middlewares:
+        - node-common
+        - ws-cors
+      tls:
+        certResolver: "le"
+
+    rpc-router:
+      entrypoints:
+        - web
+      rule: "Host(`localhost`) && Path(`/public`)"
+      service: rpc-service
+      middlewares:
+        - node-common
+        - rpc-cors
+        - forceSSL
+      tls:
+        certResolver: "le"
+
+  middlewares:
+    forceSSL:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    node-common:
+      headers:
+        accessControlAllowOriginList: [ https://app.subsocial.network,https://sub.id,https://polkaverse.com,https://polkadot.js.org ]
+        accessControlMaxAge: 100
+        addVaryHeader: true
+        frameDeny: true
+    ws-cors:
+      headers:
+        accessControlAllowMethods: [ GET ]
+    rpc-cors:
+      headers:
+        accessControlAllowMethods: [ GET, OPTIONS, POST ]
