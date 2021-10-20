@@ -2,17 +2,19 @@ http:
   services:
     ws-service:
       loadbalancer:
+        passHostHeader: false
         servers:
           - url: "http://localhost:9944"
 
     rpc-service:
       loadbalancer:
+        passHostHeader: false
         servers:
           - url: "http://localhost:9933"
 
   routers:
     ws-router:
-      rule: "Host(`localhost`)"
+      rule: "Host(`localhost`) && Path(`/`)"
       service: ws-service
       middlewares:
         - node-common
@@ -35,4 +37,3 @@ http:
         accessControlMaxAge: 100
         addVaryHeader: true
         frameDeny: true
-        hostsProxyHeaders: true
