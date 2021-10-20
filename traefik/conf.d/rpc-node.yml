@@ -30,15 +30,10 @@ http:
       middlewares:
         - node-common
         - rpc-cors
-        - forceSSL
       tls:
         certResolver: "le"
 
   middlewares:
-    forceSSL:
-      redirectScheme:
-        scheme: https
-        permanent: true
     node-common:
       headers:
         accessControlAllowOriginList: [ https://app.subsocial.network,https://sub.id,https://polkaverse.com,https://polkadot.js.org ]
