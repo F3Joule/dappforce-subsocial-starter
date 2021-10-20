@@ -12,7 +12,7 @@ http:
 
   routers:
     ws-router:
-      rule: "Host(`localhost`) && Path(`/public-ws`)"
+      rule: "Host(`localhost`)"
       service: ws-service
       middlewares:
         - node-common
@@ -21,7 +21,7 @@ http:
         certResolver: "le"
 
     rpc-router:
-      rule: "Host(`localhost`) && Path(`/public`)"
+      rule: "Host(`localhost`) && Path(`/http`)"
       service: rpc-service
       middlewares:
         - node-common
