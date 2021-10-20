@@ -16,7 +16,6 @@ http:
       service: ws-service
       middlewares:
         - node-common
-        - ws-cors
       tls:
         certResolver: "le"
 
@@ -25,20 +24,15 @@ http:
       service: rpc-service
       middlewares:
         - node-common
-        - rpc-cors
       tls:
         certResolver: "le"
 
   middlewares:
     node-common:
       headers:
+        accessControlAllowMethods: [ GET, OPTIONS, POST ]
         accessControlAllowOriginList: [ https://app.subsocial.network,https://sub.id,https://polkaverse.com,https://polkadot.js.org ]
         accessControlMaxAge: 100
         addVaryHeader: true
         frameDeny: true
-    ws-cors:
-      headers:
-        accessControlAllowMethods: [ GET ]
-    rpc-cors:
-      headers:
-        accessControlAllowMethods: [ GET, OPTIONS, POST ]
+        hostsProxyHeaders: true
