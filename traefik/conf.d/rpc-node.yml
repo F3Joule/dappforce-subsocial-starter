@@ -12,8 +12,6 @@ http:
 
   routers:
     ws-router:
-      entrypoints:
-        - web
       rule: "Host(`localhost`) && Path(`/public-ws`)"
       service: ws-service
       middlewares:
@@ -23,8 +21,6 @@ http:
         certResolver: "le"
 
     rpc-router:
-      entrypoints:
-        - web
       rule: "Host(`localhost`) && Path(`/public`)"
       service: rpc-service
       middlewares:
