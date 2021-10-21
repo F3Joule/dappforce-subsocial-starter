@@ -2,12 +2,21 @@ http:
   services:
     ws-service:
       loadbalancer:
+        healthcheck:
+          path: /health
+          port: 9933
+          interval: "5s"
+          timeout: "2s"
         passHostHeader: false
         servers:
           - url: "http://localhost:9944"
 
     rpc-service:
       loadbalancer:
+        healthcheck:
+          path: /health
+          interval: "5s"
+          timeout: "2s"
         passHostHeader: false
         servers:
           - url: "http://localhost:9933"
