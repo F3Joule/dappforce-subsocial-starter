@@ -26,7 +26,7 @@ http:
       rule: "Host(`localhost`) && Path(`/`)"
       service: ws-service
       middlewares:
-        - access-control
+        - ws-secure
       tls:
         certResolver: "le"
 
@@ -34,19 +34,46 @@ http:
       rule: "Host(`localhost`) && Path(`/http`)"
       service: rpc-service
       middlewares:
-        - access-control
+        - rpc-secure
       tls:
         certResolver: "le"
 
   middlewares:
-    access-control:
+    rpc-secure:
+      chain:
+        middlewares:
+          - allowed-origins-secure
+          - access-control-rpc
+
+    ws-secure:
+      chain:
+        middlewares:
+          - allowed-origins-secure
+          - access-control-ws
+
+    allowed-origins-secure:
       headers:
-        accessControlAllowMethods: [ GET, OPTIONS, POST ]
+        accessControlMaxAge: 100
+        addVaryHeader: true
+        frameDeny: true
+        contentTypeNosniff: true
         accessControlAllowOriginList:
           - https://app.subsocial.network
           - https://sub.id
           - https://polkaverse.com
           - https://polkadot.js.org
-        accessControlMaxAge: 100
-        addVaryHeader: true
-        frameDeny: true
+
+    access-control-ws:
+      headers:
+        accessControlAllowMethods: [ GET ]
+        accessControlAllowHeaders:
+          - Connection
+          - Upgrade
+          - Sec-WebSocket-Key
+          - Sec-WebSocket-Version
+
+    access-control-rpc:
+      headers:
+        accessControlAllowMethods: [ OPTIONS, POST ]
+        accessControlAllowHeaders:
+          - Content-Type
