@@ -42,6 +42,8 @@ http:
     access-control:
       headers:
         accessControlAllowMethods: [ GET, OPTIONS, POST ]
+        accessControlAllowHeaders:
+          - Content-Type
         accessControlAllowOriginList:
           - https://app.subsocial.network
           - https://sub.id
@@ -50,3 +52,4 @@ http:
         accessControlMaxAge: 100
         addVaryHeader: true
         frameDeny: true
+        contentTypeNosniff: true
