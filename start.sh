@@ -55,6 +55,7 @@ export ES_OFFCHAIN_PASSWORD=""
 
 # Substrate related variables
 export SUBSTRATE_NODE_EXTRA_OPTS=""
+export SUBSTRATE_RPC_CORS="https://app.subsocial.network,https://sub.id,https://polkaverse.com,https://polkadot.js.org"
 
 # Offchain related variables
 export OFFCHAIN_CORS="http://localhost"
@@ -687,6 +688,16 @@ while :; do
                 COMPOSE_FILES+=$SELECTED_SUBSTRATE
             fi
             ;;
+
+        --substrate-cors)
+            if [[ -z $2 ]]; then
+                printf $COLOR_R'USAGE: --substrate-cors "http://localhost,https://polkadot.js.org"\n'$COLOR_RESET >&2
+                break
+            else
+                SUBSTRATE_RPC_CORS="$2"
+                shift
+            fi
+        ;;
 
         #################################################
         # Extra options for IPFS Cluster
