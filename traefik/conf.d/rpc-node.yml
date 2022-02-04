@@ -4,12 +4,12 @@ http:
       loadbalancer:
         healthcheck:
           path: /health
-          port: 9933
+          port: 8833
           interval: "5s"
           timeout: "2s"
         passHostHeader: false
         servers:
-          - url: "http://localhost:9944"
+          - url: "http://localhost:8844"
 
     rpc-service:
       loadbalancer:
@@ -19,11 +19,11 @@ http:
           timeout: "2s"
         passHostHeader: false
         servers:
-          - url: "http://localhost:9933"
+          - url: "http://localhost:8833"
 
   routers:
     ws-router:
-      rule: "Host(`localhost`) && Path(`/`)"
+      rule: "Host(`para.subsocial.network`) && Path(`/`)"
       service: ws-service
       middlewares:
         - secure
@@ -31,7 +31,7 @@ http:
         certResolver: "le"
 
     rpc-router:
-      rule: "Host(`localhost`) && Path(`/http`)"
+      rule: "Host(`para.subsocial.network`) && Path(`/http`)"
       service: rpc-service
       middlewares:
         - secure-rpc
